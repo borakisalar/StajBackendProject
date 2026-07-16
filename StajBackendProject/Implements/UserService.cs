@@ -14,19 +14,19 @@ namespace StajBackendProject.Implements
 
         public List<Users> GetAllUsers()
         {
-            return _context.Users.ToList();
+            return _context.Users.Where(u => u.IsActive == true).ToList();
         }
         public Users? GetUserById(int id)
         {
-            return _context.Users.Find(id);
+            return _context.Users.SingleOrDefault(u => u.Id == id && u.IsActive == true);
         }
         public List<Users> GetUserByFirstName(string FirstName)
         {
-            return _context.Users.Where(u => u.FirstName.Contains(FirstName)).ToList();
+            return _context.Users.Where(u => u.FirstName.Contains(FirstName) && u.IsActive == true).ToList();
         }
         public Users? GetUserByEmail(string Email)
         {
-            return _context.Users.SingleOrDefault(u => u.Email == Email);
+            return _context.Users.SingleOrDefault(u => u.Email == Email && u.IsActive == true);
         }
         public void AddNewUser(Users user)
         {
@@ -44,7 +44,7 @@ namespace StajBackendProject.Implements
             _context.SaveChanges();
             return true;
         }
-        public bool DeactivateUser(int id)
+        public bool SoftDeleteUserById(int id)
         {
             var user = _context.Users.Find(id);
             if (user == null)

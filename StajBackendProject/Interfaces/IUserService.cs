@@ -11,7 +11,7 @@ namespace StajBackendProject.Interfaces
         Users? GetUserByEmail(string Email);
         void AddNewUser(Users user);
         bool DeleteUser(int id);
-        bool DeactivateUser(int id);
+        bool SoftDeleteUserById(int id);
         bool ActivateUser (int id);
     }
 }

@@ -80,9 +80,9 @@ namespace StajBackendProject.Controllers
 
         // Put : api/Users/5/deactivate
         [HttpPut("{id}/deactivate")]
-        public IActionResult DeactivateUser(int id)
+        public IActionResult SoftDeleteUserById(int id)
         {
-            bool isDeactivated = _userService.DeactivateUser(id);
+            bool isDeactivated = _userService.SoftDeleteUserById(id);
             if (!isDeactivated)
             {
                 return NotFound("User not found.");
