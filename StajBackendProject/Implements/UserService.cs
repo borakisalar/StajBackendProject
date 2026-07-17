@@ -7,9 +7,11 @@ namespace StajBackendProject.Implements
     public class UserService : IUserService
     {
         private readonly UsersContext _context;
-        public UserService(UsersContext context)
+        private readonly IPasswordHasher _hasher;
+        public UserService(UsersContext context, IPasswordHasher hasher)
         {
             _context = context;
+            _hasher = hasher;
         }
 
         public List<Users> GetAllUsers()
@@ -30,6 +32,7 @@ namespace StajBackendProject.Implements
         }
         public void AddNewUser(Users user)
         {
+            user.PasswordHash = _hasher.Hash(user.PasswordHash);
             _context.Users.Add(user);
             _context.SaveChanges();
         }
