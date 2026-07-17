@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StajBackendProject.Models;
 using StajBackendProject.Interfaces;
+using StajBackendProject.Models.Dto;
 
 namespace StajBackendProject.Controllers
 {
@@ -60,9 +61,9 @@ namespace StajBackendProject.Controllers
 
         // Post : api/Users
         [HttpPost]
-        public IActionResult AddNewUser([FromBody] Users user)
+        public IActionResult AddNewUser([FromBody] AddNewUserDto dto)
         {
-            _userService.AddNewUser(user);
+            _userService.AddNewUser(dto);
             return Ok("User successfully added.");
         }
 
@@ -100,6 +101,18 @@ namespace StajBackendProject.Controllers
                 return NotFound("User not found.");
             }
             return Ok("User successfully activated.");
+        }
+
+        // Post : api/Users/login
+        [HttpPost("login")]
+        public IActionResult Login([FromBody]  LoginDto request) 
+        {
+            bool isSuccessful = _userService.Login(request.Email, request.Password);
+            if (!isSuccessful)
+            {
+                return Unauthorized("Email or password is incorrect.");
+            }
+            return Ok("Login successful.");
         }
     }
 }

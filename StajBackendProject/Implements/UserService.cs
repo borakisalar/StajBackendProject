@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using StajBackendProject.Interfaces;
 using StajBackendProject.Models;
+using StajBackendProject.Models.Dto;
 
 namespace StajBackendProject.Implements
 {
@@ -30,10 +31,20 @@ namespace StajBackendProject.Implements
         {
             return _context.Users.SingleOrDefault(u => u.Email == Email && u.IsActive == true);
         }
-        public void AddNewUser(Users user)
+        public void AddNewUser(AddNewUserDto dto)
         {
-            user.PasswordHash = _hasher.Hash(user.PasswordHash);
-            _context.Users.Add(user);
+            var newUser = new Users
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                IsActive = true,
+                InsertDate = DateTime.Now,
+                PasswordHash = _hasher.Hash(dto.Password),
+                PhoneNumber = dto.PhoneNumber,
+                Role = "User"
+            };
+            _context.Users.Add(newUser);
             _context.SaveChanges();
         }
         public bool DeleteUser(int id)
@@ -74,6 +85,19 @@ namespace StajBackendProject.Implements
                 _context.SaveChanges();
             }
             return true;
+        }
+        public bool Login(string email, string password) 
+        {
+            var user = GetUserByEmail(email);
+            if (user == null || !user.IsActive)
+            {
+                return false;
+            }
+            if (user.PasswordHash == _hasher.Hash(password)) 
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

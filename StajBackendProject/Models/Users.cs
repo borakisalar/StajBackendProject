@@ -9,8 +9,8 @@
         public string PasswordHash { get; set; }
         public string PhoneNumber { get; set; }
         public bool IsActive { get; set; }
-        public string Role { get; set; } = "User";
-        public DateTime InsertDate { get; set; } = DateTime.Now;
+        public string Role { get; set; }
+        public DateTime InsertDate { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
 }
