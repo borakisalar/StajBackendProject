@@ -99,5 +99,9 @@ namespace StajBackendProject.Implements
             }
             return false;
         }
+        public List<Users> GetAllUsersOrderByDate() 
+        {
+            return _context.Users.Where(u => u.IsActive).OrderByDescending(u => u.InsertDate).ToList();
+        }
     }
 }

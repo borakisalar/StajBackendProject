@@ -15,5 +15,6 @@ namespace StajBackendProject.Interfaces
         bool SoftDeleteUserById(int id);
         bool ActivateUser (int id);
         bool Login(string Email, string PasswordHash);
+        List<Users> GetAllUsersOrderByDate();
     }
 }

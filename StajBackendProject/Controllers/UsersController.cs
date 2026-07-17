@@ -114,5 +114,13 @@ namespace StajBackendProject.Controllers
             }
             return Ok("Login successful.");
         }
+
+        // Get : api/Users/recent
+        [HttpGet("recent")]
+        public IActionResult GetAllUsersOrderByDate()
+        {
+            var users = _userService.GetAllUsersOrderByDate();
+            return Ok(users);
+        }
     }
 }
