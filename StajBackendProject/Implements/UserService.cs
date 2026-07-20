@@ -42,7 +42,7 @@ namespace StajBackendProject.Implements
                 InsertDate = DateTime.Now,
                 PasswordHash = _hasher.Hash(dto.Password),
                 PhoneNumber = dto.PhoneNumber,
-                Role = "User"
+                Role = Enums.UserRole.User
             };
             _context.Users.Add(newUser);
             _context.SaveChanges();
