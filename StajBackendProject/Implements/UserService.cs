@@ -33,6 +33,13 @@ namespace StajBackendProject.Implements
         }
         public void AddNewUser(AddNewUserDto dto)
         {
+            bool isUserExist = _context.Users.Any(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber && u.PhoneNumber != "");
+
+            if (isUserExist)
+            {
+                throw new InvalidOperationException("This email or phone number is already registered.");
+            }
+
             var newUser = new Users
             {
                 FirstName = dto.FirstName,

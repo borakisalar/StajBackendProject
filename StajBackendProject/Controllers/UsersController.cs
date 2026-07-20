@@ -63,8 +63,19 @@ namespace StajBackendProject.Controllers
         [HttpPost]
         public IActionResult AddNewUser([FromBody] AddNewUserDto dto)
         {
-            _userService.AddNewUser(dto);
-            return Ok("User successfully added.");
+            try
+            {
+                _userService.AddNewUser(dto);
+                return Ok("User successfully added.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch 
+            {
+                return StatusCode(500, "An error occurred on the server side.");
+            }
         }
 
         // Delete : api/Users/5
