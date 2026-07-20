@@ -33,7 +33,8 @@ namespace StajBackendProject.Implements
         }
         public void AddNewUser(AddNewUserDto dto)
         {
-            bool isUserExist = _context.Users.Any(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber && u.PhoneNumber != "");
+            bool isUserExist = _context.Users.Any(u => u.Email == dto.Email
+            || (!string.IsNullOrWhiteSpace(dto.PhoneNumber) && u.PhoneNumber == dto.PhoneNumber));
 
             if (isUserExist)
             {
