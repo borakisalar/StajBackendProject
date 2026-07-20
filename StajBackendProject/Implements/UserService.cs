@@ -93,7 +93,7 @@ namespace StajBackendProject.Implements
             {
                 return false;
             }
-            if (user.PasswordHash == _hasher.Hash(password)) 
+            if (!_hasher.Verify(password, user.PasswordHash)) 
             {
                 return true;
             }

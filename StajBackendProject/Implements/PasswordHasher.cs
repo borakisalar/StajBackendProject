@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using StajBackendProject.Interfaces;
+﻿using StajBackendProject.Interfaces;
 
 namespace StajBackendProject.Implements
 {
@@ -8,11 +6,12 @@ namespace StajBackendProject.Implements
     {
         public string Hash(string password) 
         {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(bytes);
-            }
+            return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 11);
+        }
+
+        public bool Verify(string password, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
     }
 }
