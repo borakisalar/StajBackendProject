@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using StajBackendProject.Factories;
 using StajBackendProject.Interfaces;
 using StajBackendProject.Models;
 using StajBackendProject.Models.Dto;
@@ -54,6 +55,12 @@ namespace StajBackendProject.Implements
             };
             _context.Users.Add(newUser);
             _context.SaveChanges();
+
+            NotificationFactory notificationFactory = new NotificationFactory();
+
+            INotificationService notifier = notificationFactory.CreateNotification("email");
+
+            notifier.Send(dto.Email, $"Welcome {dto.FirstName}! Registration successfully completed.");
         }
         public bool DeleteUser(int id)
         {
