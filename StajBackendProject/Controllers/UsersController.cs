@@ -61,11 +61,11 @@ namespace StajBackendProject.Controllers
 
         // Post : api/Users
         [HttpPost]
-        public IActionResult AddNewUser([FromBody] AddNewUserDto dto)
+        public async Task<IActionResult> AddNewUser([FromBody] AddNewUserDto dto)
         {
             try
             {
-                _userService.AddNewUser(dto);
+                await _userService.AddNewUserAsync(dto);
                 return Ok("User successfully added.");
             }
             catch (InvalidOperationException ex)

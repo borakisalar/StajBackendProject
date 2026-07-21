@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using Microsoft.EntityFrameworkCore;
 using StajBackendProject.Factories;
 using StajBackendProject.Interfaces;
 using StajBackendProject.Models;
@@ -32,9 +32,11 @@ namespace StajBackendProject.Implements
         {
             return _context.Users.SingleOrDefault(u => u.Email == Email && u.IsActive == true);
         }
-        public void AddNewUser(AddNewUserDto dto)
+        public async Task AddNewUserAsync(AddNewUserDto dto)
         {
-            bool isUserExist = _context.Users.Any(u => u.Email == dto.Email
+            string normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+
+            bool isUserExist = await _context.Users.AnyAsync(u => u.Email == normalizedEmail
             || (!string.IsNullOrWhiteSpace(dto.PhoneNumber) && u.PhoneNumber == dto.PhoneNumber));
 
             if (isUserExist)
@@ -46,7 +48,7 @@ namespace StajBackendProject.Implements
             {
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
-                Email = dto.Email,
+                Email = normalizedEmail,
                 IsActive = true,
                 InsertDate = DateTime.Now,
                 PasswordHash = _hasher.Hash(dto.Password),
@@ -54,7 +56,7 @@ namespace StajBackendProject.Implements
                 Role = Enums.UserRole.User
             };
             _context.Users.Add(newUser);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             NotificationFactory notificationFactory = new NotificationFactory();
 

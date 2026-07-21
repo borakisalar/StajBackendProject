@@ -10,7 +10,7 @@ namespace StajBackendProject.Interfaces
         Users? GetUserById(int id);
         List<Users> GetUserByFirstName(string FirstName);
         Users? GetUserByEmail(string Email);
-        void AddNewUser(AddNewUserDto request);
+        Task AddNewUserAsync(AddNewUserDto request);
         bool DeleteUser(int id);
         bool SoftDeleteUserById(int id);
         bool ActivateUser (int id);
