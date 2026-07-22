@@ -6,6 +6,7 @@ namespace StajBackendProject.Models
     {
         public UsersContext(DbContextOptions<UsersContext> options):base(options) { }
         public DbSet<Users> Users { get; set; } = null;
+        public DbSet<Role> Roles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -28,6 +29,12 @@ namespace StajBackendProject.Models
                 .HasIndex(u => u.PhoneNumber)
                 .IsUnique()
                 .HasFilter("[PhoneNumber] IS NOT NULL AND [PhoneNumber] <> ''");
+
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, Name = "Admin" },
+                new Role { Id = 2, Name = "User" },
+                new Role { Id = 3, Name = "Manager" }
+            );
         }
     }
 }

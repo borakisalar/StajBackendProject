@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StajBackendProject.Enums;
 using StajBackendProject.Interfaces;
-using StajBackendProject.Models;
 using StajBackendProject.Models.Dto;
 
 namespace StajBackendProject.Controllers

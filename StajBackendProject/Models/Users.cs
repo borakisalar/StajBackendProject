@@ -1,6 +1,4 @@
-﻿using StajBackendProject.Enums;
-
-namespace StajBackendProject.Models
+﻿namespace StajBackendProject.Models
 {
     public class Users
     {
@@ -11,7 +9,7 @@ namespace StajBackendProject.Models
         public string PasswordHash { get; set; }
         public string PhoneNumber { get; set; }
         public bool IsActive { get; set; }
-        public UserRole Role { get; set; }
+        public ICollection<Role> Roles { get; set; }
         public int FailedLoginAttempts { get; set; }
         public DateTime? LockoutEnd { get; set; }
         public DateTime? LastLoginDate { get; set; }

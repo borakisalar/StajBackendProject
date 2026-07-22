@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using StajBackendProject.Enums;
-using StajBackendProject.Models;
+﻿using StajBackendProject.Models;
 using StajBackendProject.Models.Dto;
 
 namespace StajBackendProject.Interfaces

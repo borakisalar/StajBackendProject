@@ -18,19 +18,29 @@ namespace StajBackendProject.Implements
 
         public List<Users> GetAllUsers()
         {
-            return _context.Users.Where(u => u.IsActive == true && u.DeletedAt == null).ToList();
+            return _context.Users
+                .Include(u => u.Roles)
+                .Where(u => u.IsActive == true && u.DeletedAt == null)
+                .ToList();
         }
         public Users? GetUserById(int id)
         {
-            return _context.Users.SingleOrDefault(u => u.Id == id && u.IsActive == true);
+            return _context.Users
+                .Include(u => u.Roles)
+                .SingleOrDefault(u => u.Id == id && u.IsActive == true);
         }
         public List<Users> GetUserByFirstName(string FirstName)
         {
-            return _context.Users.Where(u => u.FirstName.Contains(FirstName) && u.IsActive == true).ToList();
+            return _context.Users
+                .Include(u => u.Roles)
+                .Where(u => u.FirstName.Contains(FirstName) && u.IsActive == true)
+                .ToList();
         }
         public Users? GetUserByEmail(string Email)
         {
-            return _context.Users.SingleOrDefault(u => u.Email == Email && u.IsActive == true);
+            return _context.Users
+                .Include(u => u.Roles)
+                .SingleOrDefault(u => u.Email == Email && u.IsActive == true);
         }
         public async Task AddNewUserAsync(AddNewUserDto dto)
         {
@@ -44,6 +54,8 @@ namespace StajBackendProject.Implements
                 throw new InvalidOperationException("This email or phone number is already registered.");
             }
 
+            var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "User");
+
             var newUser = new Users
             {
                 FirstName = dto.FirstName,
@@ -53,8 +65,14 @@ namespace StajBackendProject.Implements
                 InsertDate = DateTime.UtcNow,
                 PasswordHash = _hasher.Hash(dto.Password),
                 PhoneNumber = dto.PhoneNumber,
-                Role = Enums.UserRole.User
+                Roles = new List<Role>()
             };
+
+            if (defaultRole != null)
+            {
+                newUser.Roles.Add(defaultRole);
+            }
+
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
