@@ -12,8 +12,12 @@ namespace StajBackendProject.Models
         public string PhoneNumber { get; set; }
         public bool IsActive { get; set; }
         public UserRole Role { get; set; }
+        public int FailedLoginAttempts { get; set; }
+        public DateTime? LockoutEnd { get; set; }
+        public DateTime? LastLoginDate { get; set; }
         public DateTime InsertDate { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }
 

@@ -18,7 +18,7 @@ namespace StajBackendProject.Implements
 
         public List<Users> GetAllUsers()
         {
-            return _context.Users.Where(u => u.IsActive == true).ToList();
+            return _context.Users.Where(u => u.IsActive == true && u.DeletedAt == null).ToList();
         }
         public Users? GetUserById(int id)
         {
@@ -50,7 +50,7 @@ namespace StajBackendProject.Implements
                 LastName = dto.LastName,
                 Email = normalizedEmail,
                 IsActive = true,
-                InsertDate = DateTime.Now,
+                InsertDate = DateTime.UtcNow,
                 PasswordHash = _hasher.Hash(dto.Password),
                 PhoneNumber = dto.PhoneNumber,
                 Role = Enums.UserRole.User
@@ -85,6 +85,7 @@ namespace StajBackendProject.Implements
             if (user.IsActive)
             {
                 user.IsActive = false;
+                user.DeletedAt = DateTime.UtcNow;
                 _context.SaveChanges();
             }
             return true;
@@ -99,26 +100,80 @@ namespace StajBackendProject.Implements
             if (!user.IsActive)
             {
                 user.IsActive = true;
+                user.DeletedAt = null;
                 _context.SaveChanges();
             }
             return true;
         }
-        public bool Login(string email, string password) 
+        public LoginResultDto Login(string email, string password)
         {
+            email = email.Trim().ToLowerInvariant();
+
             var user = GetUserByEmail(email);
+
             if (user == null || !user.IsActive)
             {
-                return false;
+                return new LoginResultDto
+                {
+                    Success = false,
+                    Message = "Email or password is incorrect."
+                };
             }
-            if (!_hasher.Verify(password, user.PasswordHash)) 
+
+            if (user.LockoutEnd.HasValue && user.LockoutEnd <= DateTime.UtcNow)
             {
-                return true;
+                user.LockoutEnd = null;
+                user.FailedLoginAttempts = 0;
+                _context.SaveChanges();
             }
-            return false;
+
+            if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            {
+                return new LoginResultDto
+                {
+                    Success = false,
+                    Message = "Account is temporarily locked.",
+                    LockoutEnd = user.LockoutEnd
+                };
+            }
+
+            if (!_hasher.Verify(password, user.PasswordHash))
+            {
+                user.FailedLoginAttempts++;
+
+                if (user.FailedLoginAttempts >= 5)
+                {
+                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                    user.FailedLoginAttempts = 0;
+                }
+
+                _context.SaveChanges();
+
+                return new LoginResultDto
+                {
+                    Success = false,
+                    Message = user.LockoutEnd.HasValue
+                        ? "Account has been locked for 15 minutes."
+                        : "Email or password is incorrect.",
+                    LockoutEnd = user.LockoutEnd
+                };
+            }
+
+            user.FailedLoginAttempts = 0;
+            user.LockoutEnd = null;
+            user.LastLoginDate = DateTime.UtcNow;
+
+            _context.SaveChanges();
+
+            return new LoginResultDto
+            {
+                Success = true,
+                Message = "Login successful."
+            };
         }
         public List<Users> GetAllUsersOrderByDate() 
         {
-            return _context.Users.Where(u => u.IsActive).OrderByDescending(u => u.InsertDate).ToList();
+            return _context.Users.Where(u => u.IsActive && u.DeletedAt == null).OrderByDescending(u => u.InsertDate).ToList();
         }
     }
 }

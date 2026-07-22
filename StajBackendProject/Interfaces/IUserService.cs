@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using StajBackendProject.Enums;
 using StajBackendProject.Models;
 using StajBackendProject.Models.Dto;
 
@@ -14,7 +15,7 @@ namespace StajBackendProject.Interfaces
         bool DeleteUser(int id);
         bool SoftDeleteUserById(int id);
         bool ActivateUser (int id);
-        bool Login(string Email, string PasswordHash);
+        LoginResultDto Login(string email, string password);
         List<Users> GetAllUsersOrderByDate();
     }
 }

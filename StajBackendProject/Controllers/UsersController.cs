@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StajBackendProject.Models;
+using StajBackendProject.Enums;
 using StajBackendProject.Interfaces;
+using StajBackendProject.Models;
 using StajBackendProject.Models.Dto;
 
 namespace StajBackendProject.Controllers
@@ -116,14 +117,21 @@ namespace StajBackendProject.Controllers
 
         // Post : api/Users/login
         [HttpPost("login")]
-        public IActionResult Login([FromBody]  LoginDto request) 
+        public IActionResult Login([FromBody] LoginDto request)
         {
-            bool isSuccessful = _userService.Login(request.Email, request.Password);
-            if (!isSuccessful)
+            var result = _userService.Login(request.Email, request.Password);
+
+            if (result.Success)
             {
-                return Unauthorized("Email or password is incorrect.");
+                return Ok(result);
             }
-            return Ok("Login successful.");
+
+            if (result.LockoutEnd.HasValue)
+            {
+                return StatusCode(StatusCodes.Status423Locked, result);
+            }
+
+            return Unauthorized(result);
         }
 
         // Get : api/Users/recent
