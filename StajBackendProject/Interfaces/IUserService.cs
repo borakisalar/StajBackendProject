@@ -5,7 +5,7 @@ namespace StajBackendProject.Interfaces
 {
     public interface IUserService
     {
-        List<Users> GetAllUsers();
+        List<UserResponseDto> GetAllUsers();
         Users? GetUserById(int id);
         List<Users> GetUserByFirstName(string FirstName);
         Users? GetUserByEmail(string Email);

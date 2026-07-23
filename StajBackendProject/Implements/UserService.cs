@@ -1,8 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using StajBackendProject.Factories;
 using StajBackendProject.Interfaces;
 using StajBackendProject.Models;
@@ -15,19 +12,23 @@ namespace StajBackendProject.Implements
         private readonly UsersContext _context;
         private readonly IPasswordHasher _hasher;
         private readonly ITokenService _tokenService;
-        public UserService(UsersContext context, IPasswordHasher hasher, ITokenService tokenService)
+        private readonly IMapper _mapper;
+        public UserService(UsersContext context, IPasswordHasher hasher, ITokenService tokenService, IMapper mapper)
         {
             _context = context;
             _hasher = hasher;
             _tokenService = tokenService;
+            _mapper = mapper;
         }
 
-        public List<Users> GetAllUsers()
+        public List<UserResponseDto> GetAllUsers()
         {
-            return _context.Users
+            var users = _context.Users
                 .Include(u => u.Roles)
                 .Where(u => u.IsActive == true && u.DeletedAt == null)
                 .ToList();
+
+            return _mapper.Map<List<UserResponseDto>>(users);
         }
         public Users? GetUserById(int id)
         {
