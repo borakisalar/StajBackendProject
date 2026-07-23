@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StajBackendProject.Interfaces;
 using StajBackendProject.Models.Dto;
@@ -7,7 +8,6 @@ namespace StajBackendProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -18,6 +18,7 @@ namespace StajBackendProject.Controllers
 
         // Get : api/Users
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult GetAllUsers()
         {
             var users = _userService.GetAllUsers();
@@ -82,6 +83,7 @@ namespace StajBackendProject.Controllers
 
         // Delete : api/Users/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteUser(int id)
         {
             bool isDeleted = _userService.DeleteUser(id);
@@ -142,6 +144,36 @@ namespace StajBackendProject.Controllers
         {
             var users = _userService.GetAllUsersOrderByDate();
             return Ok(users);
+        }
+
+        // Get : api/Users/my-info
+        [HttpGet("my-info")]
+        [Authorize]
+        public IActionResult GetMyTokenInfo()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var userRoles = User.Claims
+                                .Where(c => c.Type == ClaimTypes.Role)
+                                .Select(c => c.Value)
+                                .ToList();
+            var expClaim = User.FindFirstValue("exp");
+            DateTime tokenExpirationDate = DateTime.MinValue;
+
+            if (expClaim != null && long.TryParse(expClaim, out long expSeconds))
+            {
+                tokenExpirationDate = DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime;
+            }
+
+            return Ok(new
+            {
+                Message = "Token successfully decoded!",
+                UserId = userId,
+                Email = userEmail,
+                Roles = userRoles,
+                TokenExpiresAt = tokenExpirationDate
+            });
         }
     }
 }
