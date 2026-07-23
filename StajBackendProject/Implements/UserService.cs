@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StajBackendProject.Factories;
 using StajBackendProject.Interfaces;
 using StajBackendProject.Models;
@@ -10,10 +14,12 @@ namespace StajBackendProject.Implements
     {
         private readonly UsersContext _context;
         private readonly IPasswordHasher _hasher;
-        public UserService(UsersContext context, IPasswordHasher hasher)
+        private readonly ITokenService _tokenService;
+        public UserService(UsersContext context, IPasswordHasher hasher, ITokenService tokenService)
         {
             _context = context;
             _hasher = hasher;
+            _tokenService = tokenService;
         }
 
         public List<Users> GetAllUsers()
@@ -183,10 +189,13 @@ namespace StajBackendProject.Implements
 
             _context.SaveChanges();
 
+            string token = _tokenService.GenerateJwtToken(user);
+
             return new LoginResultDto
             {
                 Success = true,
-                Message = "Login successful."
+                Message = "Login successful.",
+                Token = token
             };
         }
         public List<Users> GetAllUsersOrderByDate() 

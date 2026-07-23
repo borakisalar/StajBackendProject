@@ -1,4 +1,6 @@
-﻿namespace StajBackendProject.Interfaces
+﻿using StajBackendProject.Interfaces;
+
+namespace StajBackendProject.Implements
 {
     public class SmsNotification : INotificationService
     {

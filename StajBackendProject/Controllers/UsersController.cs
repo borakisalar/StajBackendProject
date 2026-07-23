@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StajBackendProject.Interfaces;
 using StajBackendProject.Models.Dto;
 
@@ -6,6 +7,7 @@ namespace StajBackendProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -60,6 +62,7 @@ namespace StajBackendProject.Controllers
 
         // Post : api/Users
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> AddNewUser([FromBody] AddNewUserDto dto)
         {
             try
@@ -115,6 +118,7 @@ namespace StajBackendProject.Controllers
 
         // Post : api/Users/login
         [HttpPost("login")]
+        [AllowAnonymous]
         public IActionResult Login([FromBody] LoginDto request)
         {
             var result = _userService.Login(request.Email, request.Password);
