@@ -8,6 +8,6 @@ namespace StajBackendProject.Models
         public string Name { get; set; }
 
         [JsonIgnore]
-        public ICollection<Users> Users { get; set; }
+        public ICollection<User> Users { get; set; }
     }
 }

@@ -21,6 +21,12 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddProfile<UserProfile>();
+    config.AddProfile<RoleProfile>();
+});
 builder.Services.AddAutoMapper(config =>
 {
     config.AddProfile<UserProfile>();
