@@ -30,20 +30,20 @@ namespace StajBackendProject.Implements
 
             return _mapper.Map<List<UserResponseDto>>(users);
         }
-        public Users? GetUserById(int id)
+        public User? GetUserById(int id)
         {
             return _context.Users
                 .Include(u => u.Roles)
                 .SingleOrDefault(u => u.Id == id && u.IsActive == true);
         }
-        public List<Users> GetUserByFirstName(string FirstName)
+        public List<User> GetUserByFirstName(string FirstName)
         {
             return _context.Users
                 .Include(u => u.Roles)
                 .Where(u => u.FirstName.Contains(FirstName) && u.IsActive == true)
                 .ToList();
         }
-        public Users? GetUserByEmail(string Email)
+        public User? GetUserByEmail(string Email)
         {
             return _context.Users
                 .Include(u => u.Roles)
@@ -63,7 +63,7 @@ namespace StajBackendProject.Implements
 
             var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "User");
 
-            var newUser = new Users
+            var newUser = new User
             {
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
@@ -199,9 +199,43 @@ namespace StajBackendProject.Implements
                 Token = token
             };
         }
-        public List<Users> GetAllUsersOrderByDate() 
+        public List<User> GetAllUsersOrderByDate() 
         {
             return _context.Users.Where(u => u.IsActive && u.DeletedAt == null).OrderByDescending(u => u.InsertDate).ToList();
+        }
+        public bool AssignRoleToUser(int userId, int roleId)
+        {
+            // Include(u => u.Roles) çok önemlidir! Kullanıcının mevcut rollerini belleğe çeker.
+            var user = _context.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id == userId);
+            if (user == null) throw new Exception("User not found.");
+
+            var role = _context.Roles.Find(roleId);
+            if (role == null) throw new Exception("Role not found.");
+
+            // Kullanıcıda bu rol zaten var mı kontrolü
+            if (user.Roles.Any(r => r.Id == roleId))
+            {
+                throw new Exception("User already has this role.");
+            }
+
+            user.Roles.Add(role);
+            _context.SaveChanges();
+
+            return true;
+        }
+
+        public bool RemoveRoleFromUser(int userId, int roleId)
+        {
+            var user = _context.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id == userId);
+            if (user == null) throw new Exception("User not found.");
+
+            var role = user.Roles.FirstOrDefault(r => r.Id == roleId);
+            if (role == null) throw new Exception("The user does not have this role.");
+
+            user.Roles.Remove(role);
+            _context.SaveChanges();
+
+            return true;
         }
     }
 }

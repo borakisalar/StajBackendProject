@@ -6,7 +6,7 @@ using StajBackendProject.Models.Dto;
 
 namespace StajBackendProject.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -174,6 +174,38 @@ namespace StajBackendProject.Controllers
                 Roles = userRoles,
                 TokenExpiresAt = tokenExpirationDate
             });
+        }
+
+        // POST api/users/{id}/roles
+        [HttpPost("{id}/roles")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult AssignRole(int id, [FromBody] AssignRoleDto request)
+        {
+            try
+            {
+                _userService.AssignRoleToUser(id, request.RoleId);
+                return Ok(new { Message = "Role successfully assigned to the user." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        // DELETE api/users/{id}/roles/{roleId}
+        [HttpDelete("{id}/roles/{roleId}")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult RemoveRole(int id, int roleId)
+        {
+            try
+            {
+                _userService.RemoveRoleFromUser(id, roleId);
+                return Ok(new { Message = "Role successfully removed from the user." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
     }
 }

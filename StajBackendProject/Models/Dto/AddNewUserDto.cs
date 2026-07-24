@@ -21,6 +21,9 @@ namespace StajBackendProject.Models.Dto
         [DefaultValue("johndoe@example.com")]
         public string Email { get; set; }
 
+        [StringLength(128, MinimumLength = 8, ErrorMessage = "Password must be at least 8 and at most 128 characters long.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,#])[A-Za-z\d@$!%*?&.,#]{8,128}$",
+            ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.")]
         [DefaultValue("Password123!")]
         public string Password { get; set; }
 

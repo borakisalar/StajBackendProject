@@ -8,7 +8,7 @@ namespace StajBackendProject.Mappings
     {
         public UserProfile()
         {
-            CreateMap<Users, UserResponseDto>()
+            CreateMap<User, UserResponseDto>()
                 .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles.Select(r => r.Name)));
         }
     }

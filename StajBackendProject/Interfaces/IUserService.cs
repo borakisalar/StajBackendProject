@@ -6,14 +6,16 @@ namespace StajBackendProject.Interfaces
     public interface IUserService
     {
         List<UserResponseDto> GetAllUsers();
-        Users? GetUserById(int id);
-        List<Users> GetUserByFirstName(string FirstName);
-        Users? GetUserByEmail(string Email);
+        User? GetUserById(int id);
+        List<User> GetUserByFirstName(string FirstName);
+        User? GetUserByEmail(string Email);
         Task AddNewUserAsync(AddNewUserDto request);
         bool DeleteUser(int id);
         bool SoftDeleteUserById(int id);
         bool ActivateUser (int id);
         LoginResultDto Login(string email, string password);
-        List<Users> GetAllUsersOrderByDate();
+        List<User> GetAllUsersOrderByDate();
+        bool AssignRoleToUser(int userId, int roleId);
+        bool RemoveRoleFromUser(int userId, int roleId);
     }
 }

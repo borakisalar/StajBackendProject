@@ -16,7 +16,7 @@ namespace StajBackendProject.Implements
             _configuration = configuration;
         }
 
-        public string GenerateJwtToken(Users user)
+        public string GenerateJwtToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
