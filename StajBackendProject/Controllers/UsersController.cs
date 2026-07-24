@@ -11,9 +11,11 @@ namespace StajBackendProject.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UsersController(IUserService userService)
+        private readonly ITokenService _tokenService;
+        public UsersController(IUserService userService, ITokenService tokenService)
         {
             _userService = userService;
+            _tokenService = tokenService;
         }
 
         // Get : api/Users
@@ -39,8 +41,8 @@ namespace StajBackendProject.Controllers
 
         // Post : api/Users
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> AddNewUser([FromBody] AddNewUserDto dto)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateUserByAdmin([FromBody] AddNewUserDto dto)
         {
             try
             {
@@ -92,26 +94,6 @@ namespace StajBackendProject.Controllers
                 return NotFound("User not found.");
             }
             return Ok("User successfully activated.");
-        }
-
-        // Post : api/Users/login
-        [HttpPost("login")]
-        [AllowAnonymous]
-        public IActionResult Login([FromBody] LoginDto request)
-        {
-            var result = _userService.Login(request.Email, request.Password);
-
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-
-            if (result.LockoutEnd.HasValue)
-            {
-                return StatusCode(StatusCodes.Status423Locked, result);
-            }
-
-            return Unauthorized(result);
         }
 
         // Get : api/Users/recent
@@ -177,30 +159,6 @@ namespace StajBackendProject.Controllers
             {
                 _userService.RemoveRoleFromUser(id, roleId);
                 return Ok(new { Message = "Role successfully removed from the user." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
-
-        // POST api/auth/change-password
-        [HttpPost("change-password")]
-        [Authorize]
-        public IActionResult ChangePassword([FromBody] ChangePasswordDto request)
-        {
-            try
-            {
-                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
-                {
-                    return Unauthorized(new { Message = "Invalid or expired token." });
-                }
-
-                _userService.ChangePassword(userId, request);
-
-                return Ok(new { Message = "Password changed successfully." });
             }
             catch (Exception ex)
             {

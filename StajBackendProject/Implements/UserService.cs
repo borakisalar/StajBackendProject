@@ -177,6 +177,10 @@ namespace StajBackendProject.Implements
             user.LockoutEnd = null;
             user.LastLoginDate = DateTime.UtcNow;
 
+            string refreshToken = _tokenService.GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
             _context.SaveChanges();
 
             string token = _tokenService.GenerateJwtToken(user);
@@ -185,7 +189,8 @@ namespace StajBackendProject.Implements
             {
                 Success = true,
                 Message = "Login successful.",
-                Token = token
+                AccessToken = token,
+                RefreshToken = refreshToken
             };
         }
         public List<User> GetAllUsersOrderByDate() 
