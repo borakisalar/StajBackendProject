@@ -37,30 +37,6 @@ namespace StajBackendProject.Controllers
             return Ok(user);
         }
 
-        // Get : api/Users/Bora
-        [HttpGet("name/{FirstName}")]
-        public IActionResult GetUserByFirstName(string FirstName)
-        {
-            var userList = _userService.GetUserByFirstName(FirstName);
-            if (userList == null || !userList.Any())
-            {
-                return NotFound("There is no user with first name " + FirstName + ".");
-            }
-            return Ok(userList);
-        }
-
-        // Get : api/Users/bora@example.com
-        [HttpGet("email/{Email}")]
-        public IActionResult GetUserByEmail(string Email)
-        {
-            var user = _userService.GetUserByEmail(Email);
-            if (user == null)
-            {
-                return NotFound("User not found.");
-            }
-            return Ok(user);
-        }
-
         // Post : api/Users
         [HttpPost]
         [AllowAnonymous]
@@ -201,6 +177,30 @@ namespace StajBackendProject.Controllers
             {
                 _userService.RemoveRoleFromUser(id, roleId);
                 return Ok(new { Message = "Role successfully removed from the user." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        // POST api/auth/change-password
+        [HttpPost("change-password")]
+        [Authorize]
+        public IActionResult ChangePassword([FromBody] ChangePasswordDto request)
+        {
+            try
+            {
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+                {
+                    return Unauthorized(new { Message = "Invalid or expired token." });
+                }
+
+                _userService.ChangePassword(userId, request);
+
+                return Ok(new { Message = "Password changed successfully." });
             }
             catch (Exception ex)
             {

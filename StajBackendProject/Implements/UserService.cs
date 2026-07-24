@@ -36,19 +36,6 @@ namespace StajBackendProject.Implements
                 .Include(u => u.Roles)
                 .SingleOrDefault(u => u.Id == id && u.IsActive == true);
         }
-        public List<User> GetUserByFirstName(string FirstName)
-        {
-            return _context.Users
-                .Include(u => u.Roles)
-                .Where(u => u.FirstName.Contains(FirstName) && u.IsActive == true)
-                .ToList();
-        }
-        public User? GetUserByEmail(string Email)
-        {
-            return _context.Users
-                .Include(u => u.Roles)
-                .SingleOrDefault(u => u.Email == Email && u.IsActive == true);
-        }
         public async Task AddNewUserAsync(AddNewUserDto dto)
         {
             string normalizedEmail = dto.Email.Trim().ToLowerInvariant();
@@ -134,7 +121,9 @@ namespace StajBackendProject.Implements
         {
             email = email.Trim().ToLowerInvariant();
 
-            var user = GetUserByEmail(email);
+            var user = _context.Users
+                .Include(u => u.Roles)
+                .SingleOrDefault(u => u.Email == email && u.IsActive == true);
 
             if (user == null || !user.IsActive)
             {
@@ -205,14 +194,12 @@ namespace StajBackendProject.Implements
         }
         public bool AssignRoleToUser(int userId, int roleId)
         {
-            // Include(u => u.Roles) çok önemlidir! Kullanıcının mevcut rollerini belleğe çeker.
             var user = _context.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id == userId);
             if (user == null) throw new Exception("User not found.");
 
             var role = _context.Roles.Find(roleId);
             if (role == null) throw new Exception("Role not found.");
 
-            // Kullanıcıda bu rol zaten var mı kontrolü
             if (user.Roles.Any(r => r.Id == roleId))
             {
                 throw new Exception("User already has this role.");
@@ -233,6 +220,27 @@ namespace StajBackendProject.Implements
             if (role == null) throw new Exception("The user does not have this role.");
 
             user.Roles.Remove(role);
+            _context.SaveChanges();
+
+            return true;
+        }
+        public bool ChangePassword(int userId, ChangePasswordDto request)
+        {
+            var user = _context.Users.Find(userId);
+            if (user == null) throw new Exception("User not found.");
+
+            bool isOldPasswordCorrect = _hasher.Verify(request.OldPassword, user.PasswordHash);
+
+            if (!isOldPasswordCorrect)
+            {
+                throw new Exception("The old password you entered is incorrect.");
+            }
+
+            user.PasswordHash = _hasher.Hash(request.NewPassword);
+
+            user.UpdatedAt = DateTime.UtcNow;
+            user.PasswordLastChangedAt = DateTime.UtcNow;
+
             _context.SaveChanges();
 
             return true;

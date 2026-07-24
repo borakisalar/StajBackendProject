@@ -7,8 +7,6 @@ namespace StajBackendProject.Interfaces
     {
         List<UserResponseDto> GetAllUsers();
         User? GetUserById(int id);
-        List<User> GetUserByFirstName(string FirstName);
-        User? GetUserByEmail(string Email);
         Task AddNewUserAsync(AddNewUserDto request);
         bool DeleteUser(int id);
         bool SoftDeleteUserById(int id);
@@ -17,5 +15,6 @@ namespace StajBackendProject.Interfaces
         List<User> GetAllUsersOrderByDate();
         bool AssignRoleToUser(int userId, int roleId);
         bool RemoveRoleFromUser(int userId, int roleId);
+        bool ChangePassword(int userId, ChangePasswordDto request);
     }
 }

@@ -14,6 +14,7 @@
         public DateTime? LockoutEnd { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public DateTime InsertDate { get; set; }
+        public DateTime? PasswordLastChangedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
     }
